@@ -1,0 +1,17 @@
+# CLion / JetBrains
+.idea/
+cmake-build-*/
+CMakeLists.txt.user
+
+# CMake build folders
+CMakeFiles/
+CMakeCache.txt
+Makefile
+cmake_install.cmake
+
+# Windows build junk
+*.exe
+*.obj
+*.dll
+*.pdb
+*.log
