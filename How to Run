@@ -32,20 +32,8 @@ How to Run on Windows:
 
     4. COMPILE THE PROJECT
        - Run this command from the project root (to paste on MINGW press "insert" button):
-gcc \
-  src/main.c \
-  src/create_queue.c \
-  src/enqueue.c \
-  src/dequeue.c \
-  src/free_queue.c \
-  src/is_empty.c \
-  src/output.c \
-  src/validation.c \
-  src/peek.c \
-  src/queue_to_string.c \
-  -Iinclude \
-  `pkg-config --cflags --libs gtk+-3.0` \
-  -o emergency_room.exe
+            gcc src/*.c -Iinclude -o main.exe $(pkg-config --cflags --libs gtk+-3.0)
+
     5. RUN THE APPLICATION
        - In the same terminal:
-           ./emergency_room.exe
+           ./main.exe

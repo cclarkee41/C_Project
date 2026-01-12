@@ -1,5 +1,5 @@
 // main.c (GTK3)
-// Compile: gcc *.c -o main $(pkg-config --cflags --libs gtk+-3.0)
+// Compile: gcc src/*.c -Iinclude -o main $(pkg-config --cflags --libs gtk+-3.0)
 // After compile run ./main
 
 #include <gtk/gtk.h>
