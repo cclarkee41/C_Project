@@ -6,8 +6,6 @@
 #include <stddef.h>
 #include "queue.h"
 
-/* -------- Printing Functions -------- */
-
 // Print a single patient in readable format
 void print_patient(const Patient* p, FILE* out);
 
@@ -19,9 +17,6 @@ void print_next_patient_summary(const Patient* p, FILE* out);
 
 // Dequeue and print the patient (safe wrapper)
 bool dequeue_and_print(PriorityQueue* q, FILE* out);
-
-
-/* -------- Validation + Safe Wrappers -------- */
 
 // Check if priority is within [1,5]
 bool is_valid_priority(int p);
@@ -39,8 +34,7 @@ bool safe_enqueue(PriorityQueue* q,
 // Safe dequeue wrapper
 bool safe_dequeue(PriorityQueue* q, FILE* out);
 
-/* -------- GUI helpers -------- */
-
+//GUI helpers
 // Write a readable snapshot of the queue into a caller-provided buffer.
 // Always null-terminates when outSize > 0.
 void queue_to_string(const PriorityQueue* q, char* out, size_t outSize);

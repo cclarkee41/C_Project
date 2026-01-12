@@ -5,22 +5,17 @@
 #include <stdbool.h>
 #include "queue.h"
 
-/* -------- Printing Functions -------- */
-
-// Print a single patient in readable format
+// Print a single patient
 void print_patient(const Patient* p, FILE* out);
 
 // Print the entire queue from front to back
 void print_queue(const PriorityQueue* q, FILE* out);
 
-// Print a short summary of the next patient
+// Print summary of the next patient
 void print_next_patient_summary(const Patient* p, FILE* out);
 
-// Dequeue and print the patient (safe wrapper)
+// Dequeue and print the patient
 bool dequeue_and_print(PriorityQueue* q, FILE* out);
-
-
-/* -------- Validation + Safe Wrappers -------- */
 
 // Check if priority is within [1,5]
 bool is_valid_priority(int p);
