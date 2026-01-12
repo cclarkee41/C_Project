@@ -1,0 +1,39 @@
+How to Run on MacOS or Linux:
+
+    Download GTK-3 (with homebrew): brew install gtk+3
+
+    Compile Command: gcc src/*.c -Iinclude -o main $(pkg-config --cflags --libs gtk+-3.0)
+
+    Run Program: ./main
+
+How to Run on Windows:
+
+    1. INSTALL MSYS2
+       - Download MSYS2 from: https://www.msys2.org
+       - Install it to the default location: C:\msys64
+       - Open “MSYS2 MSYS” from the Start Menu.
+       - Update the system:
+           pacman -Syuu
+       - If it asks to restart, close the window and run the command again until no updates remain.
+
+    2. INSTALL THE MINGW-W64 TOOLCHAIN AND GTK3
+       - Open “MSYS2 MinGW x64” (IMPORTANT: not the MSYS shell).
+       - The terminal prompt must show: MINGW64 ~
+       - Install the compiler and GTK3:
+           pacman -S --needed base-devel mingw-w64-x86_64-toolchain
+           pacman -S --needed mingw-w64-x86_64-gtk3
+       - Verify GTK installation:
+           pkg-config --cflags --libs gtk+-3.0
+         You should see a long list of include paths and libraries.
+
+    3. NAVIGATE TO THE PROJECT FOLDER
+       - Still inside MSYS2 MinGW x64, go to the project directory:
+           cd /c/path/to/your/project
+
+    4. COMPILE THE PROJECT
+       - Run this command from the project root (to paste on MINGW press "insert" button):
+            gcc src/*.c -Iinclude -o main.exe $(pkg-config --cflags --libs gtk+-3.0)
+
+    5. RUN THE APPLICATION
+       - In the same terminal:
+           ./main.exe
