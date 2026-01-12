@@ -5,24 +5,13 @@
 #include <gtk/gtk.h>
 #include <stdio.h>
 #include <string.h>
+
 #include "queue.h"
-
-// ---- Queue API you will implement in other files ----
-
-Queue* createQueue(void);
-void enqueue(Queue* q, const char* name, const char* reason, int prio);
-int  dequeue(Queue* q, char* outName, char* outReason, int* outPrio); // return 1 if ok, 0 if empty
-int  peek(Queue* q, char* outName, char* outReason, int* outPrio);    // return 1 if ok, 0 if empty
-int  isEmpty(Queue* q);
-void freeQueue(Queue* q);
-
-// Optional: have queue build a string into a buffer for printing in GUI
-void printQueueToString(Queue* q, char* out, size_t outSize);
-// ----------------------------------------------------
+#include "output.h"
 
 typedef struct {
     GtkTextBuffer *log_buffer;
-    Queue *queue;
+    PriorityQueue queue;
 } AppState;
 
 static void append_log(AppState *app, const char *line) {
@@ -48,10 +37,7 @@ static void show_error(GtkWindow *parent, const char *msg) {
 static void on_quit(GtkWidget *w, gpointer user_data) {
     (void)w;
     AppState *app = (AppState*)user_data;
-    if (app->queue) {
-        freeQueue(app->queue);
-        app->queue = NULL;
-    }
+    free_queue(&app->queue);
     gtk_main_quit();
 }
 
@@ -62,7 +48,7 @@ static void on_print_queue(GtkWidget *w, gpointer user_data) {
     char buf[4096];
     buf[0] = '\0';
 
-    printQueueToString(app->queue, buf, sizeof(buf));
+    queue_to_string(&app->queue, buf, sizeof(buf));
     append_log(app, "QUEUE SNAPSHOT:");
     append_log(app, buf[0] ? buf : "(empty)");
 }
@@ -71,7 +57,7 @@ static void on_check_empty(GtkWidget *w, gpointer user_data) {
     (void)w;
     AppState *app = (AppState*)user_data;
 
-    if (isEmpty(app->queue)) append_log(app, "STATUS: Queue is empty");
+    if (is_empty(&app->queue)) append_log(app, "STATUS: Queue is empty");
     else append_log(app, "STATUS: Queue has patients");
 }
 
@@ -79,16 +65,14 @@ static void on_announce_next(GtkWidget *w, gpointer user_data) {
     (void)w;
     AppState *app = (AppState*)user_data;
 
-    char name[128], reason[256];
-    int prio = 0;
-
-    if (!peek(app->queue, name, reason, &prio)) {
+    Patient p;
+    if (!peek(&app->queue, &p)) {
         append_log(app, "NEXT: Queue empty");
         return;
     }
 
     char line[512];
-    snprintf(line, sizeof(line), "NEXT: %s | Priority %d | Reason: %s", name, prio, reason);
+    snprintf(line, sizeof(line), "NEXT: %s | Priority %d | Reason: %s", p.name, p.priority, p.reason);
     append_log(app, line);
 }
 
@@ -96,16 +80,14 @@ static void on_care_next(GtkWidget *w, gpointer user_data) {
     (void)w;
     AppState *app = (AppState*)user_data;
 
-    char name[128], reason[256];
-    int prio = 0;
-
-    if (!dequeue(app->queue, name, reason, &prio)) {
+    Patient p;
+    if (!dequeue(&app->queue, &p)) {
         append_log(app, "DEQUEUE: Queue empty");
         return;
     }
 
     char line[512];
-    snprintf(line, sizeof(line), "DEQUEUE: %s | Priority %d | Reason: %s", name, prio, reason);
+    snprintf(line, sizeof(line), "DEQUEUE: %s | Priority %d | Reason: %s", p.name, p.priority, p.reason);
     append_log(app, line);
 }
 
@@ -172,7 +154,11 @@ static void on_admit(GtkWidget *w, gpointer user_data) {
             return;
         }
 
-        enqueue(app->queue, name, reason, prio);
+        if (!enqueue(&app->queue, name, reason, prio)) {
+            show_error(parent, "Failed to admit patient. Check inputs.");
+            gtk_widget_destroy(dialog);
+            return;
+        }
 
         char line[512];
         snprintf(line, sizeof(line), "ADMIT: %s | Priority %d | Reason: %s", name, prio, reason);
@@ -238,7 +224,7 @@ int main(int argc, char **argv) {
     gtk_init(&argc, &argv);
 
     AppState app;
-    app.queue = createQueue();
+    app.queue = create_queue();
 
     GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title(GTK_WINDOW(window), "ER Patient Management");
